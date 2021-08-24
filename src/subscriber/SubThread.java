@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SubThread extends Thread {
 
     private final AtomicBoolean running = new AtomicBoolean(true);
+    private final Topic topic;
     Publisher publisher = Publisher.instantiate();
-    private Topic topic;
     private int receiveCount = 1;
 
 
@@ -20,7 +20,8 @@ public class SubThread extends Thread {
     }
 
     public void receive(Announcement announcement) {
-        System.out.println(String.format("%d) I am thread %d, I am subscribed to %s, this is my announcement: %s", receiveCount, this.getId(), this.topic, announcement.getAnnouncement()));
+        System.out.println(String.format("%d) I am thread %d, I am subscribed to %s, this is my announcement: %s",
+                receiveCount, this.getId(), this.topic, announcement.getAnnouncement()));
         receiveCount++;
     }
 

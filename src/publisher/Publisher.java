@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 public class Publisher implements Runnable {
 
     private static Publisher publisherSingleton;
-    private AnnouncementGetterStrategy announcementGetterStrategy;
-    private List<SubThread> subscribers = new ArrayList<>();
-    private List<AnnouncementStore> announcementStores = Arrays.asList(
+    private final List<SubThread> subscribers = new ArrayList<>();
+    private final List<AnnouncementStore> announcementStores = Arrays.asList(
             new BusinessAnnouncementsStore(),
             new NewsAnnouncementsStore(),
             new SportsAnnouncementsStore()
     );
+    private AnnouncementGetterStrategy announcementGetterStrategy;
     private Map<Topic, List<Announcement>> announcements;
 
 
@@ -51,14 +51,16 @@ public class Publisher implements Runnable {
 
     private void populateAnnouncements() {
         announcements = announcementStores.stream()
-                .map(announcementStore -> Map.of(announcementStore.getTopic(), announcementStore.getAnnouncementsStore()))
+                .map(announcementStore -> Map.of(announcementStore.getTopic(),
+                        announcementStore.getAnnouncementsStore()))
                 .flatMap(map -> map.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void publishToSubs() {
         subscribers.stream()
-                .map(subscriber -> Map.of(subscriber, announcementGetterStrategy.getAnnouncement(announcements.get(subscriber.getTopic()))))
+                .map(subscriber -> Map.of(subscriber,
+                        announcementGetterStrategy.getAnnouncement(announcements.get(subscriber.getTopic()))))
                 .flatMap(map -> map.entrySet().stream())
                 .forEach(entry -> entry.getKey().receive(entry.getValue()));
     }
